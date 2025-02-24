@@ -1,81 +1,100 @@
-Below is a comprehensive, professional guide for managing your NodeOps Network node on a VPS. This article is organized from top to bottom with clear sections, headings, and code blocks—with plenty of emojis to help guide you!
+![image](https://github.com/user-attachments/assets/6b5d61b4-78ff-4d74-86d3-cba7eb252491)
+
+# 🌌 **The Ultimate Guide to Setting Up and Troubleshooting NodeOps Network (Formerly Atlas Node)** 🌌
+
+Welcome to the definitive guide for running a node on **NodeOps Network**, the rebranded evolution of Atlas Node! Whether you’re a beginner setting up your first node or an expert troubleshooting pesky issues like "Pending" status or leftover processes, this article is your one-stop resource. Packed with detailed steps, vibrant code blocks, and emoji-driven clarity, we’ll ensure your node runs smoothly on a VPS. Let’s get started! 🚀
+
+**Current Date:** February 24, 2025  
+**Focus:** NodeOps Network (formerly Atlas Node)  
 
 ---
 
-# 🚀 The Ultimate Guide to Configuring & Managing Your NodeOps Network Node on a VPS
-
-_NodeOps Network (formerly Atlas Network) offers decentralized node management solutions. This guide will walk you through ensuring your VPS meets requirements, verifying network settings, updating your system, handling critical swap issues, and removing an old node before deploying a new one._
+## 📋 **Table of Contents**
+1. [🔍 Step 1: Verify Your VPS Meets NodeOps Requirements](#step-1-verify-vps)  
+2. [🔓 Step 2: Open Required Network Ports](#step-2-open-ports)  
+3. [🛠️ Step 3: Update Your System](#step-3-update-system)  
+4. [📴 Step 4: Disable Swap (The Critical Fix)](#step-4-disable-swap)  
+5. [🗑️ Step 5: Remove an Old Node (If Needed)](#step-5-remove-old-node)  
+6. [✅ Step 6: Install and Run Your NodeOps Node](#step-6-install-node)  
+7. [🔧 Step 7: Troubleshoot Common Issues](#step-7-troubleshoot)  
+8. [💡 Step 8: Tips for Long-Term Success](#step-8-tips)  
 
 ---
 
-## 🔍 **Section I: VPS Hardware Requirements & Checks**
+## 🔍 **Step 1: Verify Your VPS Meets NodeOps Requirements**  
+Before diving into setup, confirm your VPS can handle NodeOps Network. Below are the minimum specs and commands to check them!  
 
-Before running your NodeOps Network node, **make sure your VPS meets these minimum requirements**:
-
+### **Minimum Requirements**  
 - **CPUs or vCPUs:** ≥2  
 - **RAM:** ≥4GB  
 - **Storage:** ≥80GB NVMe SSD  
-- **Network Bandwidth:** ≥1Gbps (unlimited)  
+- **Bandwidth:** ≥1Gbps unlimited  
 - **Uptime:** ≥99%  
-- **OS:** Debian (12+) or Ubuntu (22.04+) with Linux Kernel 6.1+, updated with the latest security patches
+- **OS:** Debian 12+ or Ubuntu 22.04+ with Linux kernel 6.1+  
 
-### **🖥️ Verify Your VPS Specs**
+### **Verification Commands**  
+#### 1. **Check CPU Cores**  
+```bash
+nproc
+```
+- **Expected:** ≥`2` ✅  
+- **Why:** Ensures enough processing power.
 
-1. **Check CPU Cores:**
-   ```bash
-   nproc
-   ```
-   *Output should be 2 or higher.*
+#### 2. **Check RAM**  
+```bash
+free -m | awk '/Mem:/ {print $2}'
+```
+- **Expected:** ≥`4096` MB (4GB) ✅  
+- **Why:** Confirms sufficient memory.
 
-2. **Check Total RAM:**
-   ```bash
-   free -m | awk '/Mem:/ {print $2}'
-   ```
-   *Output should be ≥4096 MB (4GB).*
+#### 3. **Check Storage**  
+```bash
+df -h / | awk 'NR==2 {print $2}'
+```
+- **Expected:** ≥`80G` ✅  
+- **Why:** Verifies enough disk space.
 
-3. **Check Storage:**
-   ```bash
-   df -h / | awk 'NR==2 {print $2}'
-   ```
-   *Output should show ≥80G.*
+#### 4. **Check Network Speed**  
+```bash
+curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -
+```
+- **Expected:** ≥`100MB` or `1Gbps` ✅  
+- **Why:** Ensures fast, unlimited bandwidth.
 
-4. **Check Network Speed:**
-   ```bash
-   curl -s https://raw.githubusercontent.com/sivel/speedtest-cli/master/speedtest.py | python3 -
-   ```
-   *Ensure speeds are around 1Gbps or as specified by your plan.*
+#### 5. **Check OS and Kernel**  
+```bash
+cat /etc/os-release; uname -r
+```
+- **Expected:** Debian 12+ or Ubuntu 22.04+, kernel ≥`6.1` ✅  
+- **Why:** Ensures OS compatibility.
 
-5. **Check OS & Kernel Version:**
-   ```bash
-   cat /etc/os-release; uname -r
-   ```
-   *Confirm you are running Debian 12+ or Ubuntu 22.04+ with Kernel ≥6.1.*
+#### 6. **Check Security Updates**  
+```bash
+sudo apt update && apt list --upgradable
+```
+- **Expected:** No critical updates pending ✅  
+- **Why:** Keeps your system secure.
 
-6. **Check for Latest Updates:**
-   ```bash
-   sudo apt update && apt list --upgradable
-   ```
-   *No critical updates should be pending.*
+💡 **Tip:** If your VPS falls short, upgrade with providers like Contabo, Vultr, Hetzner, or DigitalOcean!
 
 ---
 
-## 🔐 **Section II: Verifying & Opening Required Ports**
+## 🔓 **Step 2: Open Required Network Ports**  
+NodeOps needs specific ports open to function. Let’s configure your firewall based on your setup.
 
-Your node relies on specific ports to communicate. Ensure the following ports are open:
+### **Required Ports**  
+- **UDP:** 8472, 51820, 51821  
+- **TCP:** 10250  
 
-- **UDP 8472** (used for overlay networks like VXLAN)
-- **TCP 10250** (commonly for Kubelet API in Kubernetes)
-- **UDP 51820 & UDP 51821** (typically used by WireGuard VPN)
-
-### **🔗 Verify Open Ports**
-
+### **Port Opening Commands**  
+#### 1. **Check Active Services**  
 ```bash
 sudo netstat -tuln | grep -E '8472|10250|51820|51821'
 ```
-*If nothing appears, check that related services (e.g., Cilium, WireGuard) are active.*
+- **Expected:** Ports listed if services are running ✅  
+- **Why:** Confirms Cilium, Kubelet, and WireGuard are active.
 
-### **For UFW Users:**
-
+#### 2. **For UFW Users**  
 ```bash
 sudo ufw allow 8472/udp
 sudo ufw allow 10250/tcp
@@ -83,9 +102,9 @@ sudo ufw allow 51820/udp
 sudo ufw allow 51821/udp
 sudo ufw reload
 ```
+- **Why:** Opens ports and reloads the firewall.
 
-### **For iptables Users:**
-
+#### 3. **For iptables Users**  
 ```bash
 sudo iptables -A INPUT -p udp --dport 8472 -j ACCEPT
 sudo iptables -A INPUT -p tcp --dport 10250 -j ACCEPT
@@ -93,13 +112,14 @@ sudo iptables -A INPUT -p udp --dport 51820 -j ACCEPT
 sudo iptables -A INPUT -p udp --dport 51821 -j ACCEPT
 sudo iptables-save > /etc/iptables/rules.v4
 ```
+- **Why:** Adds rules and saves them persistently.
 
 ---
 
-## 📅 **Section III: System Update & Security Preparation**
+## 🛠️ **Step 3: Update Your System**  
+A fresh system prevents compatibility issues. Here’s how to update and secure your VPS.
 
-Keep your system secure and up to date before deploying your node.
-
+### **Update Commands**  
 ```bash
 sudo apt update -y && sudo apt upgrade -y && \
 UBUNTU_VERSION=$(lsb_release -rs | cut -d '.' -f1) && \
@@ -114,146 +134,170 @@ else \
   exit 1; \
 fi && \
 sudo apt-get install --install-recommends $KERNEL_PACKAGE -y && \
-sudo apt autoremove --purge -y && \
-sudo apt install ufw -y && \
-sudo ufw default deny incoming && \
-sudo ufw default allow outgoing && \
-sudo ufw allow ssh && \
-sudo ufw allow 8472/udp && \
-sudo ufw allow 10250/tcp && \
-sudo ufw allow 51820/udp && \
-sudo ufw allow 51821/udp && \
-sudo ufw enable && \
-sudo ufw reload && \
-sudo ufw status verbose
+sudo apt autoremove --purge -y
 ```
-
-*This command updates your system, installs the correct kernel version, and configures your firewall with the necessary ports.*
+- **Why:** Updates packages, installs the latest kernel, and removes leftovers.
 
 ---
 
-## ⚠️ **Section IV: Critical Swap Issue – Disable Swap**
+## 📴 **Step 4: Disable Swap (The Critical Fix)**  
+NodeOps requires swap to be disabled—here’s the most important step to fix "Pending" or "auto-restart" issues.
 
-For proper node operation, swap must be disabled.
-
-### **Temporarily Disable Swap**
-
+### **Commands to Disable Swap**  
+#### 1. **Turn Off Swap Temporarily**  
 ```bash
 sudo swapoff -a
 ```
-*This command immediately turns off swap.*
+- **Why:** Disables swap immediately.
 
-### **Verify Swap is Disabled**
-
+#### 2. **Verify Swap is Off**  
 ```bash
 swapon --summary
 ```
-*No output indicates swap is off.*
+- **Expected:** No output ✅  
+- **Why:** Confirms swap is disabled.
 
-### **Permanently Disable Swap**
-
-1. Open `/etc/fstab` for editing:
-   ```bash
-   sudo nano /etc/fstab
-   ```
-2. Locate the swap entry (e.g., `/swapfile none swap sw 0 0`) and comment it out by adding a `#`:
-   ```
-   # /swapfile none swap sw 0 0
-   ```
-3. Save and exit (press **Ctrl+O**, then **Enter**, then **Ctrl+X**).
-
-4. Reboot your system to apply changes:
-   ```bash
-   sudo reboot
-   ```
-
----
-
-## 🗑️ **Section V: Removing an Existing Node (NodeOps Network Provider Removal Script)**
-
-If your node is stuck (e.g., in an "awaiting-stake" state), you may want to remove it completely before deploying a new one.
-
-### **Node Removal Script**
-
+#### 3. **Disable Swap Permanently**  
+- Edit `/etc/fstab`:  
 ```bash
-#!/bin/bash
-# Stop and disable the NodeOps Network provider service 🔴
-sudo systemctl stop atlasnetwork-provider.service 2>/dev/null
-sudo systemctl disable atlasnetwork-provider.service 2>/dev/null
-sudo rm -f /etc/systemd/system/atlasnetwork-provider.service
-sudo systemctl daemon-reload
+sudo nano /etc/fstab
+```
+- Find the swap line (e.g., `/swapfile none swap sw 0 0`) and comment it out:  
+```
+# /swapfile none swap sw 0 0
+```
+- Save (`Ctrl+O`, Enter) and exit (`Ctrl+X`).
 
-# Kill any related processes 💀
-sudo pkill -9 -f "atlasnetwork-provider" 2>/dev/null
-sudo pkill -9 -f "containerd-shim" 2>/dev/null
-
-# Remove all NodeOps Network related files 🗑️
-sudo rm -f /usr/local/bin/atlas*
-sudo rm -rf /var/lib/atlasnetwork
-sudo rm -rf ~/.atlas-network
-sudo rm -rf /var/log/pods/atlasnetwork-system_net-check-*
-sudo rm -f /var/log/containers/net-check-*.log
-sudo rm -rf /sys/fs/cgroup/system.slice/atlasnetwork-provider.service
-sudo rm -rf /run/calico/cgroup/system.slice/atlasnetwork-provider.service
-
-# Clean up any Kubernetes or containerd leftovers 🧹
-sudo systemctl stop containerd 2>/dev/null
-sudo rm -rf /var/lib/rancher/k3s
-sudo rm -rf /run/k3s
-sudo rm -rf /etc/rancher
-sudo rm -f /usr/local/bin/k3s*
-sudo systemctl start containerd 2>/dev/null
-
-# (Optional) Reboot for a clean slate 🚀
+#### 4. **Reboot**  
+```bash
 sudo reboot
 ```
+- **Why:** Applies changes permanently.
 
-*Run this script to completely remove the old node and its associated files from your VPS.*
+💡 **Tip:** After reboot, recheck with `free -h`—swap should show `0` everywhere!
 
 ---
 
-## 🌟 **Section VI: Deploying a New Node**
+## 🗑️ **Step 5: Remove an Old Node (If Needed)**  
+Stuck with an old Atlas Node? Wipe it clean with this script.
 
-After ensuring your VPS is ready (hardware, ports, updated system, and swap disabled), deploy a new node with the proper script:
-
+### **Removal Script**  
 ```bash
-curl -L https://get.atlasnetwork.dev | sh -s - YOUR_NEW_NODE_CODE
+#!/bin/bash
+systemctl stop atlasnetwork-provider.service 2>/dev/null
+systemctl disable atlasnetwork-provider.service 2>/dev/null
+rm -f /etc/systemd/system/atlasnetwork-provider.service
+systemctl daemon-reload
+pkill -9 -f "atlas" 2>/dev/null
+pkill -9 -f "containerd-shim" 2>/dev/null
+rm -f /usr/local/bin/atlas*
+rm -rf /.atlas-network
+rm -rf /var/log/pods/atlasnetwork-system_net-check-*
+rm -f /var/log/containers/net-check-nqm2d_atlasnetwork-system_net-check-*.log
+rm -rf /sys/fs/cgroup/system.slice/atlasnetwork-provider.service
+rm -rf /run/calico/cgroup/system.slice/atlasnetwork-provider.service
+systemctl stop containerd 2>/dev/null
+rm -rf /var/lib/rancher/k3s
+rm -rf /run/k3s
+rm -rf /etc/rancher
+rm -f /usr/local/bin/k3s*
+systemctl start containerd 2>/dev/null
+sed -i '/vm.panic_on_oom/d' /etc/sysctl.d/90-kubelet.conf 2>/dev/null
+sed -i '/vm.overcommit_memory/d' /etc/sysctl.d/90-kubelet.conf 2>/dev/null
+sed -i '/kernel.panic/d' /etc/sysctl.d/90-kubelet.conf 2>/dev/null
+sed -i '/kernel.panic_on_oops/d' /etc/sysctl.d/90-kubelet.conf 2>/dev/null
+sysctl -p /etc/sysctl.d/90-kubelet.conf 2>/dev/null
+swapon -a 2>/dev/null
+reboot
+```
+- **Why:** Completely removes old node files and reboots for a fresh start.
+
+---
+
+## ✅ **Step 6: Install and Run Your NodeOps Node**  
+Now, let’s get your new node up and running!
+
+### **Installation Command**  
+```bash
+curl -L https://get.atlasnetwork.dev | sh -s - <YOUR_KEY>
+```
+- Replace `<YOUR_KEY>` with your unique key from `testnet-providers.nodeops.network`.
+
+### **Check Status**  
+```bash
+sudo systemctl status atlasnetwork-provider.service
+```
+- **Expected:** `Active: active (running)` ✅
+
+---
+
+## 🔧 **Step 7: Troubleshoot Common Issues**  
+Encountered a snag? Here’s how to fix common NodeOps problems.
+
+### **Issue 1: "Pending" Status**  
+- **Cause:** Swap enabled or insufficient resources.  
+- **Fix:**  
+  - Disable swap (Step 4).  
+  - Verify VPS specs (Step 1).  
+  - Restart service:  
+```bash
+sudo systemctl restart atlasnetwork-provider.service
 ```
 
-*Replace `YOUR_NEW_NODE_CODE` with the actual code provided for the new node.*
+### **Issue 2: "Left-over Processes" Error**  
+- **Cause:** Unclean termination of previous runs.  
+- **Fix:**  
+  - Kill processes:  
+```bash
+sudo pkill -f atlasnetwork-provider
+```
+  - Restart service:  
+```bash
+sudo systemctl restart atlasnetwork-provider.service
+```
+
+### **Issue 3: Node Stops After SSH Disconnect**  
+- **Fix:** Use `tmux` or `nohup`:  
+  - **tmux:**  
+```bash
+tmux new -s atlas
+<run your node command>
+```
+  - Detach: `Ctrl+B`, then `D`.  
+  - Reattach: `tmux attach -t atlas`.  
+  - **nohup:**  
+```bash
+nohup <your-node-command> &
+```
+
+### **Check Logs for Errors**  
+```bash
+journalctl -u atlasnetwork-provider.service -f
+```
 
 ---
 
-## 📈 **Section VII: Monitoring & Maintenance**
+## 💡 **Step 8: Tips for Long-Term Success**  
+Keep your node humming with these pro tips!
 
-After deployment, keep an eye on your node’s performance:
-
-- **Check Service Status:**
-  ```bash
-  sudo systemctl status atlasnetwork-provider.service
-  ```
-  *Look for “Active: active (running)” to confirm proper operation.*
-
-- **Monitor Logs:**
-  ```bash
-  journalctl -u atlasnetwork-provider.service -f
-  ```
-  *This helps you see real-time logs for any issues.*
-
-- **Resource Monitoring:**
-  ```bash
-  htop
-  ```
-  *Ensure your node has sufficient CPU and memory.*
+- **Monitor Status:**  
+```bash
+sudo systemctl status atlasnetwork-provider.service
+```
+- **Check Resources:**  
+```bash
+free -h
+```
+or  
+```bash
+top
+```
+- **Stay Updated:** Regularly run system updates (Step 3).  
+- **One Node Per VPS:** Avoid conflicts by running only one node per server.
 
 ---
 
-# 🚀 **Final Thoughts**
+## 🌟 **Final Words**  
+Congratulations! You’ve now mastered setting up and troubleshooting a **NodeOps Network** node. From verifying your VPS to disabling swap and fixing issues, you’re ready to contribute to the network like a pro. If you hit any roadblocks, revisit the steps or check the logs—success is just a command away! 🚀  
 
-By following these organized steps—from verifying your VPS specs to opening the necessary ports, updating your system, disabling swap, and finally removing and redeploying your node—you can ensure a smooth and efficient operation of your NodeOps Network node.
-
-This guide should serve as a complete resource for troubleshooting and maintaining your node environment. If you have any further questions or need assistance, feel free to reach out to the community or support team.
-
-Happy node deploying! 🚀🔧
-
----
+LSG Nodeops team ! 😎
