@@ -1,4 +1,4 @@
-![image](https://github.com/user-attachments/assets/6b5d61b4-78ff-4d74-86d3-cba7eb252491)
+<a href="https://ibb.co/vCGJRf9P"><img src="https://i.ibb.co/TDSHdJy8/New-Project-6.jpg" alt="New-Project-6" border="0"></a> 
 
 # 🌌 **The Ultimate Guide to Setting Up and Troubleshooting NodeOps Network (Formerly Atlas Node)** 🌌
 
