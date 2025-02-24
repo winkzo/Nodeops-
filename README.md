@@ -21,6 +21,35 @@ Welcome to the definitive guide for running a node on **NodeOps Network**, the r
 
 ---
 
+## 💰 **Step 0: Staking with  Arbitrum Sepolia ETH**  
+To fully activate your NodeOps node, you’ll need to stake using **Arbitrum Sepolia ETH** and a you need small amount of real **0.001 ETH in Arbitrum one mainnet ** to get "*Arbitrum Sepolia ETH**"  . Here’s how to handle this step smoothly!  
+
+### **Process**  
+1. **Get Arbitrum Sepolia ETH:**  
+   - Create a wallet (e.g., MetaMask 🦊).  
+   - Visit the faucet: [Alchemy Arbitrum Sepolia Faucet](https://www.alchemy.com/faucets/arbitrum-sepolia) 💧.  
+   - Claim some testnet ETH for staking you need to have in your wallet a real **0.001 ETH in Arbitrum one mainnet ** to get "*Arbitrum Sepolia ETH**""  .  
+
+2. **Connect to NodeOps Testnet:**  
+   - Head to `testnet-providers.nodeops.network` 🌐.  
+   - Connect your wallet 🔗—it’s super easy!  
+
+3. **Stake Your Tokens:**  
+   - Initial staking uses **Arbitrum Sepolia ETH**.  
+   - If you hit a snag (e.g., page freezes), hit `F5` to reload 🔄.  
+   - After paying with Sepolia ETH, you’ll be prompted for **0.005 Arbitrum Sepolia ETH **.  
+   - Reload again with `F5` 🔄, then enter your username and email ✍️.  
+
+4. **Run Your Machine:**  
+   - Once staked, your node will launch—boom, you’re live! 😎  
+
+### **Troubleshooting**  
+- **Staking Fails?** Reload the page (`F5`) and retry.  
+- **Need More Sepolia ETH?** Revisit the faucet ⬆️.  
+- **Check Logs:**  
+
+--- 
+
 ## 🔍 **Step 1: Verify Your VPS Meets NodeOps Requirements**  
 Before diving into setup, confirm your VPS can handle NodeOps Network. Below are the minimum specs and commands to check them!  
 
