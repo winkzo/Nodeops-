@@ -326,6 +326,32 @@ top
 
 ---
 
+:fire::rocket: CRITICAL NODE RESET & STATUS CHECK GUIDE :rocket::fire:  (If Needed) 
+
+
+---
+
+**:arrows_counterclockwise: Restart Node Command:**
+```bash
+sudo systemctl restart atlasnetwork-provider.service
+```
+ **:mobile_phone_off: Disable SWAP Temporarily**  
+   ```bash
+   sudo swapoff -a
+   ``` 
+**:mag: Check Node Status:**
+```bash
+sudo systemctl status atlasnetwork-provider.service
+```
+
+**:scroll: (Optional) View Latest Logs:**
+```bash
+journalctl -u atlasnetwork-provider.service --no-pager --lines=50
+```
+
+---
+
+ 
 ## 🌟 **Final Words**  
 Congratulations! You’ve now mastered setting up and troubleshooting a **NodeOps Network** node. From verifying your VPS to disabling swap and fixing issues, you’re ready to contribute to the network like a pro. If you hit any roadblocks, revisit the steps or check the logs—success is just a command away! 🚀  
 
